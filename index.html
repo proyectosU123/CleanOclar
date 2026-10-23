@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CleanOclar – Mantenimiento preventivo automático para tus computadores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--gi:#04231A;--warn:#B7791F;--ok:#138A55;--bg:#F4F8F6;--alt:#E9F1ED;--surface:#FFFFFF;--ink:#0F2F2C;--muted:#4C6662;--teal:#0A2E2B;--green:#1FB26E;--green-ink:#04231A;--line:#D3E0DA;--bad:#C2410C;--shadow:0 18px 50px -18px rgba(10,46,43,.35);--head:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;--body:'Public Sans','Segoe UI',system-ui,sans-serif;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1A18;--alt:#0F2220;--surface:#13292A;--ink:#E3EFEB;--muted:#9DB5B0;--line:#264543;--bad:#F29A6B;--warn:#E9B949;--ok:#4ADE9A;--shadow:0 18px 50px -18px rgba(0,0,0,.7);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B1A18;--alt:#0F2220;--surface:#13292A;--ink:#E3EFEB;--muted:#9DB5B0;--line:#264543;--bad:#F29A6B;--warn:#E9B949;--ok:#4ADE9A;--shadow:0 18px 50px -18px rgba(0,0,0,.7);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#0A2E2B;z-index:10}
+h1,h2,h3{font-family:var(--head);margin:0;letter-spacing:-.02em;line-height:1.08}
+a{color:inherit}
+svg.i{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:#0A2E2B;color:#EAF6F1}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{font:800 1.3rem var(--head);text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo span{width:12px;height:12px;border-radius:50%;background:#34D08A;box-shadow:0 0 0 4px rgba(52,208,138,.25)}
+nav{display:flex;gap:24px;font-size:.95rem}
+nav a{text-decoration:none;color:#A9CBC1}nav a:hover{color:#fff}
+.btn{display:inline-block;background:var(--green);color:var(--green-ink);font:600 1rem var(--body);border:0;border-radius:999px;padding:14px 26px;text-decoration:none;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px -8px rgba(31,178,110,.7)}
+.btn.sm{padding:10px 20px;font-size:.92rem}
+.btn.ghost{background:transparent;color:#EAF6F1;border:1.5px solid rgba(234,246,241,.35)}
+.btn.ghost:hover{box-shadow:none;border-color:#fff}
+:focus-visible{outline:3px solid #34D08A;outline-offset:3px}
+.hero{background:radial-gradient(800px 420px at 85% 10%,rgba(52,208,138,.28),transparent 60%),radial-gradient(600px 400px at 0% 100%,rgba(26,158,98,.25),transparent 60%),#0A2E2B;color:#EAF6F1;padding:76px 0 96px}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.4rem,5.4vw,4rem);font-weight:800}
+.hero .lead{font-size:1.2rem;color:#B6D4CB;margin:22px 0 32px;max-width:32em}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px;font-size:.88rem;color:#A9CBC1}
+.chips span{border:1px solid rgba(234,246,241,.2);border-radius:999px;padding:5px 14px}
+.report{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:var(--shadow)}
+.report h3{font-size:1.1rem;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{font:600 .78rem var(--body);padding:4px 12px;border-radius:99px;background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.badge.ok{background:color-mix(in srgb,var(--green) 20%,transparent);color:#138A55}
+.row{margin-top:18px}
+.lab{display:flex;justify-content:space-between;font-size:.92rem}
+.lab b{font-weight:600}
+.bar{height:10px;border-radius:99px;background:var(--line);margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);background:var(--bad);border-radius:99px;transition:width 1.1s ease,background .6s}
+.report.after .bar i{background:var(--green)}
+.report .btn{width:100%;margin-top:24px}
+.note{font-size:.82rem;color:var(--muted);margin:12px 0 0;text-align:center}
+section{padding:88px 0}
+section.alt{background:var(--alt)}
+section h2{font-size:clamp(1.9rem,3.8vw,2.8rem);font-weight:800;max-width:17em}
+.sub{color:var(--muted);max-width:40em;margin:16px 0 0;font-size:1.1rem}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.cards.two{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.ic{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--green) 18%,transparent);color:#138A55;margin-bottom:18px}
+.card h3{font-size:1.25rem;margin-bottom:8px}
+.card p{margin:0;color:var(--muted)}
+.wide{overflow-x:auto;margin-top:44px;border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+.compare{width:100%;border-collapse:collapse;min-width:560px}
+.compare th,.compare td{text-align:left;padding:16px 22px;border-bottom:1px solid var(--line)}
+.compare tr:last-child td{border-bottom:0}
+.compare th{font-weight:600;color:var(--muted);font-size:.92rem}
+.compare tr.me td{background:color-mix(in srgb,var(--green) 14%,transparent);font-weight:600}
+.steps{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;position:relative;counter-reset:s}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:30px 28px;position:relative}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--green);color:var(--green-ink);font:800 1.2rem var(--head);margin-bottom:18px;box-shadow:0 0 0 7px color-mix(in srgb,var(--green) 22%,transparent)}
+.steps h3{font-size:1.25rem;margin-bottom:8px}
+.steps p{margin:0;color:var(--muted)}
+.secure{background:#0A2E2B;color:#EAF6F1;border-radius:28px;padding:54px;display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;background-image:radial-gradient(500px 300px at 100% 0,rgba(52,208,138,.25),transparent 60%)}
+.secure .shield{width:112px;height:112px;border-radius:30px;display:grid;place-items:center;background:rgba(52,208,138,.16);color:#34D08A}
+.secure .shield svg{width:56px;height:56px}
+.secure h2{font-size:clamp(1.8rem,3.4vw,2.5rem);margin-bottom:14px}
+.secure p{margin:0;color:#B6D4CB;max-width:40em}
+.price .card{text-align:left}
+.price .card.hl{border:2px solid var(--green);box-shadow:var(--shadow)}
+.tag{display:inline-block;font:600 .78rem var(--body);background:var(--green);color:var(--green-ink);padding:3px 12px;border-radius:99px;margin-bottom:14px}
+.faq{margin-top:36px;max-width:780px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 22px;margin-bottom:12px}
+summary{cursor:pointer;font-weight:600;font-size:1.05rem}
+details p{margin:12px 0 0;color:var(--muted)}
+.contact{background:#0A2E2B;color:#EAF6F1;background-image:radial-gradient(700px 400px at 0 0,rgba(52,208,138,.25),transparent 60%)}
+.contact .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.contact .sub{color:#B6D4CB}
+form{background:var(--surface);color:var(--ink);border-radius:22px;padding:30px;display:grid;gap:16px;box-shadow:var(--shadow)}
+label{display:grid;gap:6px;font-weight:600;font-size:.92rem}
+input,select{font:400 1rem var(--body);padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus,select:focus{border-color:var(--green);outline:none}
+#ok{display:none;padding:14px 16px;border-radius:12px;background:color-mix(in srgb,var(--green) 18%,transparent);font-size:.95rem}
+footer{padding:32px 0 44px;background:#071F1D;color:#8FB0A6;font-size:.9rem}
+@media(max-width:900px){.hero .wrap,.cards,.cards.two,.steps,.contact .wrap,.secure{grid-template-columns:1fr}nav{display:none}.hero{padding:48px 0 64px}section{padding:64px 0}.secure{padding:34px}}
+@media(prefers-reduced-motion:reduce){.bar i,.btn,.card{transition:none}html{scroll-behavior:auto}}
+#plat h1,#plat h2,#plat h3{font-family:var(--head);margin:0;letter-spacing:-.01em;line-height:1.15}
+#plat h2{font-size:1.5rem}
+#plat h3{font-size:1.1rem}
+#plat .who{display:flex;align-items:center;gap:12px;font-size:.9rem}
+#plat .role{background:rgba(52,208,138,.2);color:#7BE3B5;border-radius:99px;padding:3px 12px;font-weight:600;font-size:.8rem}
+#plat .btn{background:var(--green);color:var(--gi);font:600 .92rem var(--body);border:0;border-radius:99px;padding:10px 20px;cursor:pointer}
+#plat .btn:hover{filter:brightness(1.08)}
+#plat .btn.sm{padding:6px 14px;font-size:.82rem}
+#plat .btn.o{background:transparent;color:inherit;border:1.5px solid var(--line)}
+#plat .login{max-width:440px;margin:48px auto}
+#plat .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:20px}
+#plat form{display:grid;gap:14px;margin-top:16px}
+#plat label{display:grid;gap:5px;font-weight:600;font-size:.88rem}
+#plat input,#plat select,#plat textarea{font:400 1rem var(--body);padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+#plat .demo{display:grid;gap:8px;margin-top:20px}
+#plat .demo button{display:flex;justify-content:space-between;align-items:center;text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink);font:500 .92rem var(--body);cursor:pointer}
+#plat .demo button:hover{border-color:var(--green)}
+#plat .demo small{color:var(--muted)}
+#plat .muted{color:var(--muted);font-size:.9rem}
+#plat .err{color:var(--bad);font-size:.9rem;min-height:1.2em}
+#plat .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 22px}
+#plat .kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+#plat .kpi b{display:block;font:800 1.9rem var(--head)}
+#plat .kpi span{color:var(--muted);font-size:.85rem}
+#plat .tw{overflow-x:auto}
+#plat table{width:100%;border-collapse:collapse;min-width:560px}
+#plat th,#plat td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);font-size:.92rem;vertical-align:middle}
+#plat th{color:var(--muted);font-weight:600;font-size:.82rem}
+#plat tr:last-child td{border-bottom:0}
+#plat .pill{display:inline-block;border-radius:99px;padding:2px 11px;font-size:.78rem;font-weight:600;background:color-mix(in srgb,currentColor 14%,transparent)}
+#plat .ok{color:var(--ok)}
+#plat .warn{color:var(--warn)}
+#plat .bad{color:var(--bad)}
+#plat .hb{display:inline-block;width:90px;height:8px;border-radius:99px;background:var(--line);overflow:hidden;vertical-align:middle;margin-right:8px}
+#plat .hb i{display:block;height:100%;background:currentColor;border-radius:99px;transition:width .8s}
+#plat .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#plat .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+#plat .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#plat .rep{border-top:1px solid var(--line);padding:10px 0;font-size:.9rem}
+#plat #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--teal);color:#EAF6F1;padding:10px 20px;border-radius:99px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+#plat #toast.on{opacity:1}
+@media(max-width:820px){#plat .kpis{grid-template-columns:1fr 1fr}
+#plat .two{grid-template-columns:1fr}
+#plat .who span.n{display:none}
+}
+@media(prefers-reduced-motion:reduce){#plat .hb i,#plat #toast{transition:none}
+}
+
+#plat{display:none}
+body.app #plat{display:block}
+body.app>header,body.app>main,body.app>footer{display:none}
+#pbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:#0A2E2B;color:#EAF6F1}
+#pbar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+#pbar .plogo{font:800 1.2rem var(--head);display:flex;align-items:center;gap:9px}
+#pbar .plogo i{width:11px;height:11px;border-radius:50%;background:#34D08A;box-shadow:0 0 0 4px rgba(52,208,138,.25)}
+#pbar .pr{display:flex;align-items:center;gap:12px}
+#plat .pmain{padding:28px 0 56px;background:var(--bg);min-height:100vh}
+#plat form{background:none;padding:0;box-shadow:none;border-radius:0;color:inherit}
+#plat .card:hover{transform:none;box-shadow:none}
+#plat .btn:hover{transform:none;box-shadow:none}
+#pbar .btn.o{background:transparent;color:inherit;border:1.5px solid rgba(234,246,241,.4)}
+.hr{display:flex;gap:10px;align-items:center}
+.mb{display:none;background:transparent;color:#EAF6F1;border:1.5px solid rgba(234,246,241,.4);border-radius:99px;padding:6px 14px;font:600 .85rem var(--body);cursor:pointer}
+img,svg{max-width:100%}
+@media(max-width:900px){.mb{display:inline-block}header nav.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:#0A2E2B;padding:14px 22px 20px;gap:16px;border-top:1px solid rgba(234,246,241,.15)}.hero .wrap{gap:36px}.report{max-width:520px}}
+@media(max-width:640px){#plat table,#plat thead,#plat tbody,#plat tr,#plat td{display:block;min-width:0;width:100%}#plat thead{display:none}#plat tr{border:1px solid var(--line);border-radius:14px;padding:8px 14px;margin-bottom:12px}#plat tr:last-child td{border-bottom:0}#plat td{border:0;padding:7px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;text-align:right}#plat td::before{content:attr(data-l);color:var(--muted);font-size:.8rem;font-weight:600;text-align:left}#plat td:last-child::before{content:none}#plat td:last-child{justify-content:flex-start}#plat .tw{overflow:visible}}
+@media(max-width:560px){header .wrap,#pbar .wrap{height:58px}.logo{font-size:1.1rem}.hr .btn:not(.ghost){display:none}.hero h1{font-size:2.15rem}.hero .lead{font-size:1.08rem}.cta .btn{flex:1 1 100%;text-align:center}.card,.steps li{padding:22px}.secure{padding:26px}.secure .shield{width:84px;height:84px}.contact form{padding:22px}.wrap{padding:0 16px}.compare th,.compare td{padding:12px 14px}#plat .row2{grid-template-columns:1fr}#plat .top .btn{width:100%}#plat .kpi b{font-size:1.5rem}#plat .login{margin:20px auto}#plat .card{padding:18px}#plat h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+<symbol id="panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></symbol>
+<symbol id="leaf" viewBox="0 0 24 24"><path d="M5 19c0-9 5-14 15-14 0 10-5 15-14 15"/><path d="M5 19c2-5 5-8 9-10"/></symbol>
+<symbol id="shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="repeat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2M20 4v5h-5M4 20v-5h5"/></symbol>
+<symbol id="tool" viewBox="0 0 24 24"><path d="M14 6a4 4 0 0 0 5 5l-9 9a2.5 2.5 0 0 1-4-4l9-9z"/></symbol>
+</defs></svg>
+
+<header><div class="wrap"><a class="logo" href="#top"><span></span>CleanOclar</a>
+<nav><a href="#problema">Problema</a><a href="#como">Cómo funciona</a><a href="#beneficios">Beneficios</a><a href="#seguridad">Seguridad</a><a href="#precios">Precios</a><a href="#plataforma">Plataforma</a><a href="#faq">Preguntas</a></nav>
+<div class="hr"><a class="btn sm ghost" href="#plataforma" data-open>Ingresar</a><a class="btn sm" href="#contacto">Solicitar piloto</a><button class="mb" id="mb" type="button" aria-label="Abrir menú" aria-expanded="false">Menú</button></div></div></header>
+
+<main id="top">
+<div class="hero"><div class="wrap">
+<div>
+<h1>Tus computadores, en buen estado, sin que tengas que tocarlos</h1>
+<p class="lead">CleanOclar limpia y mantiene automáticamente los equipos de tu colegio, academia o pyme, y te entrega reportes para demostrar resultados.</p>
+<div class="cta"><a class="btn" href="#contacto">Solicitar piloto gratuito</a><a class="btn ghost" href="#como">Ver cómo funciona</a></div>
+<div class="chips"><span>10 a 200 equipos</span><span>Bogotá D.C.</span><span>Sin contratos largos</span></div>
+</div>
+<div class="report" id="rep" aria-live="polite">
+<h3>Equipo SALA-03-PC12 <span class="badge" id="badge">Requiere atención</span></h3>
+<div class="row"><div class="lab"><span>Archivos temporales</span><b data-b="14,2 GB" data-a="0,8 GB">14,2 GB</b></div><div class="bar"><i style="--w:88%" data-b="88%" data-a="6%"></i></div></div>
+<div class="row"><div class="lab"><span>Programas al iniciar</span><b data-b="23" data-a="9">23</b></div><div class="bar"><i style="--w:77%" data-b="77%" data-a="30%"></i></div></div>
+<div class="row"><div class="lab"><span>Disco ocupado</span><b data-b="82 %" data-a="59 %">82 %</b></div><div class="bar"><i style="--w:82%" data-b="82%" data-a="59%"></i></div></div>
+<div class="row"><div class="lab"><span>Tiempo de arranque</span><b data-b="94 s" data-a="38 s">94 s</b></div><div class="bar"><i style="--w:94%" data-b="94%" data-a="38%"></i></div></div>
+<button class="btn" id="run" type="button">Ejecutar mantenimiento</button>
+<p class="note">Datos de ejemplo para ilustrar el reporte antes y después.</p>
+</div>
+</div></div>
+
+<section id="problema"><div class="wrap">
+<h2>El mantenimiento llega cuando el equipo ya falló</h2>
+<p class="sub">Un solo responsable de TI para decenas de computadores, quejas por equipos lentos y una dirección que pregunta por qué se gasta en mantenimiento. Revisar equipo por equipo no alcanza.</p>
+<div class="cards">
+<div class="card"><div class="ic"><svg class="i"><use href="#clock"/></svg></div><h3>Sin tiempo</h3><p>El mantenimiento preventivo se aplaza porque siempre hay una urgencia más.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#chart"/></svg></div><h3>Sin datos</h3><p>Reemplazar o reparar se decide sin saber el estado real de cada equipo.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#doc"/></svg></div><h3>Sin evidencia</h3><p>Es difícil demostrar ante la dirección el trabajo que ya se hizo.</p></div>
+</div>
+<div class="wide"><table class="compare"><thead><tr><th>Opción</th><th>Cuándo actúa</th><th>Limitación</th></tr></thead><tbody>
+<tr><td>Técnico por visita</td><td>Cuando ya hay una falla</td><td>Costo por llamada y sin seguimiento</td></tr>
+<tr><td>Plataformas corporativas</td><td>De forma continua</td><td>Precio y complejidad para flotas pequeñas</td></tr>
+<tr class="me"><td>CleanOclar</td><td>De forma programada y preventiva</td><td>Diseñado para 10 a 200 equipos</td></tr></tbody></table></div>
+</div></section>
+
+<section id="como" class="alt"><div class="wrap">
+<h2>Programa una vez, revisa los resultados cuando quieras</h2>
+<ol class="steps">
+<li><h3>Registra tu institución</h3><p>Crea tu cuenta en el panel web y organiza los equipos por salas o áreas.</p></li>
+<li><h3>Instala el agente</h3><p>Un programa liviano se instala en cada computador con una guía paso a paso.</p></li>
+<li><h3>Programa y recibe reportes</h3><p>Define horarios de limpieza y recibe el estado de cada equipo, antes y después.</p></li>
+</ol>
+</div></section>
+
+<section id="beneficios"><div class="wrap">
+<h2>Menos urgencias, equipos que duran más</h2>
+<div class="cards two">
+<div class="card"><div class="ic"><svg class="i"><use href="#down"/></svg></div><h3>Menos solicitudes de soporte</h3><p>Los equipos se mantienen ágiles y llegan menos reportes de fallas.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#panel"/></svg></div><h3>Control en un solo panel</h3><p>Ves de un vistazo qué equipos necesitan atención prioritaria.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#doc"/></svg></div><h3>Evidencia para tu dirección</h3><p>Reportes exportables que muestran qué se hizo y qué mejoró.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#leaf"/></svg></div><h3>Vida útil más larga</h3><p>El mantenimiento preventivo reduce reemplazos prematuros y residuos electrónicos.</p></div>
+</div>
+</div></section>
+
+<section id="seguridad" class="alt"><div class="wrap"><div class="secure">
+<div class="shield"><svg class="i" style="stroke-width:1.5"><use href="#shield"/></svg></div>
+<div><h2>Tú decides qué se limpia</h2><p>Defines las carpetas protegidas para evitar la eliminación de información importante y puedes ejecutar el agente en modo “solo reporte”, sin borrar nada. El tratamiento de datos sigue la Ley 1581 de 2012 de protección de datos personales.</p></div>
+</div></div></section>
+
+<section id="precios"><div class="wrap price">
+<h2>Una cuota mensual por equipo, sin sorpresas</h2>
+<p class="sub">El valor depende del número de equipos. Solicita tu cotización y la recibes el mismo día.</p>
+<div class="cards">
+<div class="card hl"><span class="tag">Base del servicio</span><div class="ic"><svg class="i"><use href="#repeat"/></svg></div><h3>Suscripción</h3><p>Pago mensual por cada equipo gestionado, sin contratos largos.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#panel"/></svg></div><h3>Implementación</h3><p>Cobro único por la instalación guiada y la configuración inicial.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#tool"/></svg></div><h3>Servicios adicionales</h3><p>Diagnósticos, configuraciones personalizadas y soporte presencial cuando lo necesites.</p></div>
+</div>
+</div></section>
+
+<section id="plataforma" class="alt"><div class="wrap">
+<h2>Conoce la plataforma por dentro</h2>
+<p class="sub">Un panel web con tres tipos de cuenta, cada una con las herramientas que necesita. Entra con una cuenta de demostración y pruébalo.</p>
+<div class="cards">
+<div class="card"><div class="ic"><svg class="i"><use href="#panel"/></svg></div><h3>Cliente</h3><p>El coordinador de TI ve la salud de sus equipos, ejecuta y programa mantenimientos, descarga reportes y reporta problemas.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#chart"/></svg></div><h3>Administrador</h3><p>El equipo de CleanOclar gestiona las organizaciones, sus equipos y el estado del servicio.</p></div>
+<div class="card"><div class="ic"><svg class="i"><use href="#tool"/></svg></div><h3>Técnico de soporte</h3><p>Atiende los tickets de los problemas que no se resuelven de forma automática.</p></div>
+</div>
+<p style="margin-top:36px"><a class="btn" href="#plataforma" data-open>Abrir la plataforma</a></p>
+</div></section>
+
+<section id="faq"><div class="wrap">
+<h2>Preguntas frecuentes</h2>
+<div class="faq">
+<details><summary>¿Qué datos ve el agente?</summary><p>El agente trabaja con información técnica del equipo, como el espacio en disco y los archivos temporales. No lee el contenido de tus documentos.</p></details>
+<details><summary>¿Qué pasa si un equipo falla?</summary><p>Si el problema no se resuelve de forma automática, el equipo de soporte te acompaña para solucionarlo.</p></details>
+<details><summary>¿Cómo se cancela el servicio?</summary><p>Puedes cancelar cuando quieras desde el panel o escribiéndonos, sin penalidades.</p></details>
+</div>
+</div></section>
+
+<section id="contacto" class="contact"><div class="wrap">
+<div><h2>Solicita tu piloto gratuito</h2><p class="sub">Cuéntanos cuántos equipos tienes y te contactamos para preparar una prueba en tu institución.</p></div>
+<form id="f">
+<label>Nombre<input name="n" required autocomplete="name"></label>
+<label>Institución o empresa<input name="i" required autocomplete="organization"></label>
+<label>Número de equipos<input name="e" type="number" min="1" required inputmode="numeric"></label>
+<label>Medio de contacto<select name="m"><option>WhatsApp</option><option>Correo electrónico</option><option>Llamada</option></select></label>
+<label>Dato de contacto<input name="c" required placeholder="Número o correo"></label>
+<button class="btn" type="submit">Solicitar piloto gratuito</button>
+<div id="ok" role="status"></div>
+</form>
+</div></section>
+</main>
+
+<footer><div class="wrap">CleanOclar es un prototipo académico desarrollado en la CUN, Ingeniería de Sistemas, Bogotá D.C.</div></footer>
+
+<script>
+(function(){
+var rep=document.getElementById('rep'),btn=document.getElementById('run'),badge=document.getElementById('badge');
+function set(a){
+ rep.classList.toggle('after',a);
+ rep.querySelectorAll('b[data-b]').forEach(function(b){b.textContent=a?b.dataset.a:b.dataset.b});
+ rep.querySelectorAll('i[data-b]').forEach(function(i){i.style.setProperty('--w',a?i.dataset.a:i.dataset.b)});
+ badge.textContent=a?'Mantenimiento completado':'Requiere atención';
+ badge.className=a?'badge ok':'badge';
+ btn.textContent=a?'Ver estado anterior':'Ejecutar mantenimiento';
+}
+var st=false;btn.addEventListener('click',function(){st=!st;set(st)});
+document.getElementById('f').addEventListener('submit',function(e){
+ e.preventDefault();
+ var ok=document.getElementById('ok'),n=this.elements.n.value.trim();
+ ok.textContent='Gracias, '+n+'. Recibimos tu solicitud y te contactaremos pronto. (Prototipo: este formulario aún no envía datos.)';
+ ok.style.display='block';this.reset();
+});
+})();
+</script>
+<div id="plat"><div id="pbar"><div class="wrap"><div class="plogo"><i></i>CleanOclar</div><div class="pr"><div class="who" id="who"></div><button class="btn sm o" id="back" type="button">Volver al sitio</button></div></div></div><div class="pmain"><div class="wrap" id="app"></div></div><div id="toast" role="status"></div></div>
+<script>(function(){
+var USERS=[
+{e:"admin@cleanoclar.co",p:"admin123",n:"Laura Gómez",r:"admin",rl:"Administrador",d:"Gestiona organizaciones y el servicio"},
+{e:"cliente@colegiosanmateo.edu.co",p:"cliente123",n:"Juan Pérez",r:"cliente",rl:"Cliente",d:"Coordinador de TI del Colegio San Mateo"},
+{e:"soporte@cleanoclar.co",p:"soporte123",n:"Sara Ruiz",r:"tecnico",rl:"Técnico de soporte",d:"Atiende los tickets que no se resuelven solos"}];
+var ORG="Colegio San Mateo";
+var orgs=[{n:"Colegio San Mateo",eq:60,st:"Activa"},{n:"Academia Nova Tech",eq:25,st:"Activa"},{n:"Contadores Asociados",eq:15,st:"Suspendida"}];
+var pcs=[["SALA-01-PC01","Sala 1",91,"Hoy"],["SALA-01-PC02","Sala 1",84,"Hace 3 días"],["SALA-02-PC07","Sala 2",62,"Hace 12 días"],["SALA-03-PC12","Sala 3",38,"Hace 25 días"],["SALA-03-PC15","Sala 3",45,"Hace 21 días"],["ADM-PC03","Administración",77,"Hace 6 días"],["ADM-PC05","Administración",55,"Hace 15 días"],["BIB-PC02","Biblioteca",88,"Hace 2 días"]].map(function(a){return{id:a[0],z:a[1],h:a[2],u:a[3]}});
+var sched=[{g:"Sala 1",d:"Viernes",h:"18:00"},{g:"Sala 3",d:"Miércoles",h:"19:30"}];
+var reps=[];
+var tks=[{id:1,o:"Colegio San Mateo",pc:"SALA-03-PC12",t:"El equipo sigue lento después de la limpieza automática.",s:"Abierto",n:""},{id:2,o:"Academia Nova Tech",pc:"AULA-02-PC04",t:"El agente no reporta desde hace 3 días.",s:"En curso",n:"Se revisa conexión remota."}];
+var me=null,msg="";
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function est(h){return h>=75?["Óptimo","ok"]:h>=50?["Regular","warn"]:["Atención","bad"]}
+function toast(t){var e=document.getElementById("toast");e.textContent=t;e.className="on";clearTimeout(toast.t);toast.t=setTimeout(function(){e.className=""},2400)}
+function hb(h){var c=est(h)[1];return '<span class="'+c+'"><span class="hb"><i style="width:'+h+'%"></i></span>'+h+' %</span>'}
+function go(){
+ var w=document.getElementById("who");
+ w.innerHTML=me?'<span class="n">'+esc(me.n)+'</span><span class="role">'+me.rl+'</span><button class="btn sm o" id="out">Salir</button>':"";
+ if(me)document.getElementById("out").onclick=function(){me=null;msg="";go()};
+ var a=document.getElementById("app");
+ a.innerHTML=!me?vLogin():me.r=="admin"?vAdmin():me.r=="cliente"?vCliente():vTec();
+ bind();
+ document.querySelectorAll('#plat table').forEach(function(t){var h=[].map.call(t.querySelectorAll('th'),function(x){return x.textContent});t.querySelectorAll('tbody tr').forEach(function(r){[].forEach.call(r.children,function(c,i){c.setAttribute('data-l',h[i]||'')})})});
+}
+function vLogin(){
+ return '<div class="login"><div class="card"><h2>Ingresa a CleanOclar</h2><p class="muted">Prototipo de la plataforma. Elige una cuenta de demostración o escribe sus datos.</p><form id="lf"><label>Correo<input id="le" type="email" required autocomplete="username"></label><label>Contraseña<input id="lp" type="password" required autocomplete="current-password"></label><div class="err" id="lerr">'+esc(msg)+'</div><button class="btn" type="submit">Iniciar sesión</button></form><div class="demo">'+USERS.map(function(u,i){return '<button type="button" data-u="'+i+'"><span><b>'+u.rl+'</b><br><small>'+esc(u.d)+'</small></span><small>Usar</small></button>'}).join("")+'</div><p class="muted" style="margin-top:14px">Las claves de demostración están dentro de la página: es un prototipo sin servidor.</p></div></div>';
+}
+function kp(v,l){return '<div class="kpi"><b>'+v+'</b><span>'+l+'</span></div>'}
+function vAdmin(){
+ var eq=0,ac=0;orgs.forEach(function(o){if(o.st=="Activa"){ac++;eq+=o.eq}});
+ var ab=tks.filter(function(t){return t.s!="Resuelto"}).length;
+ return '<h2>Panel de administración</h2><div class="kpis">'+kp(ac,"Organizaciones activas")+kp(eq,"Equipos gestionados")+kp(ab,"Tickets abiertos")+kp(reps.length,"Mantenimientos de hoy")+'</div><div class="card"><div class="top"><h3>Organizaciones</h3></div><div class="tw"><table><thead><tr><th>Organización</th><th>Equipos</th><th>Estado</th><th></th></tr></thead><tbody>'+orgs.map(function(o,i){return '<tr><td>'+esc(o.n)+'</td><td>'+o.eq+'</td><td><span class="pill '+(o.st=="Activa"?"ok":"warn")+'">'+o.st+'</span></td><td><button class="btn sm o" data-tg="'+i+'">'+(o.st=="Activa"?"Suspender":"Activar")+'</button></td></tr>'}).join("")+'</tbody></table></div></div><div class="two"><div class="card"><h3>Registrar organización</h3><form id="of"><label>Nombre<input id="on" required></label><label>Número de equipos<input id="oe" type="number" min="1" required></label><button class="btn" type="submit">Registrar</button></form></div><div class="card"><h3>Tickets recientes</h3>'+tks.map(function(t){return '<div class="rep"><b>'+esc(t.pc)+'</b> · '+esc(t.o)+'<br><span class="muted">'+esc(t.t)+'</span> <span class="pill '+(t.s=="Resuelto"?"ok":"warn")+'">'+t.s+'</span></div>'}).join("")+'</div></div>';
+}
+function vCliente(){
+ var at=pcs.filter(function(p){return p.h<50}).length,op=pcs.filter(function(p){return p.h>=75}).length;
+ var prom=Math.round(pcs.reduce(function(s,p){return s+p.h},0)/pcs.length);
+ return '<div class="top"><div><h2>'+ORG+'</h2><p class="muted" style="margin:4px 0 0">Muestra de 8 de 60 equipos</p></div><button class="btn" id="all">Ejecutar mantenimiento en todos</button></div><div class="kpis">'+kp(op,"Equipos en estado óptimo")+kp(at,"Requieren atención")+kp(prom+" %","Salud promedio")+kp(tks.filter(function(t){return t.o==ORG&&t.s!="Resuelto"}).length,"Tickets abiertos")+'</div><div class="card"><h3>Equipos</h3><div class="tw"><table><thead><tr><th>Equipo</th><th>Zona</th><th>Salud</th><th>Estado</th><th>Último mantenimiento</th><th></th></tr></thead><tbody>'+pcs.map(function(p,i){var e=est(p.h);return '<tr><td>'+p.id+'</td><td>'+p.z+'</td><td>'+hb(p.h)+'</td><td><span class="pill '+e[1]+'">'+e[0]+'</span></td><td>'+p.u+'</td><td><button class="btn sm" data-m="'+i+'">Limpiar</button> <button class="btn sm o" data-t="'+i+'">Reportar</button></td></tr>'}).join("")+'</tbody></table></div></div><div class="two"><div class="card"><h3>Programar mantenimiento</h3><form id="sf"><div class="row2"><label>Grupo<select id="sg"><option>Sala 1</option><option>Sala 2</option><option>Sala 3</option><option>Administración</option><option>Biblioteca</option></select></label><label>Día<select id="sd"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option></select></label></div><label>Hora<input id="sh" type="time" value="18:00" required></label><button class="btn" type="submit">Programar</button></form>'+sched.map(function(s,i){return '<div class="rep"><b>'+s.g+'</b> · '+s.d+' a las '+s.h+' <button class="btn sm o" data-x="'+i+'" style="float:right">Quitar</button></div>'}).join("")+'</div><div class="card"><h3>Reportes antes y después</h3>'+(reps.length?reps.slice().reverse().map(function(r){return '<div class="rep"><b>'+r.id+'</b>: salud de '+r.a+' % a '+r.d+' %<br><span class="muted">'+r.f+'</span></div>'}).join(""):'<p class="muted">Ejecuta un mantenimiento para generar el primer reporte.</p>')+'</div></div><div class="card"><h3>Reportar un problema a soporte</h3><form id="tf"><label>Equipo<select id="tp">'+pcs.map(function(p){return '<option>'+p.id+'</option>'}).join("")+'</select></label><label>Descripción<textarea id="tt" rows="3" required></textarea></label><button class="btn" type="submit">Enviar a soporte</button></form></div>';
+}
+function vTec(){
+ var ab=tks.filter(function(t){return t.s!="Resuelto"}).length;
+ return '<h2>Tickets de soporte</h2><div class="kpis">'+kp(tks.filter(function(t){return t.s=="Abierto"}).length,"Abiertos")+kp(tks.filter(function(t){return t.s=="En curso"}).length,"En curso")+kp(tks.filter(function(t){return t.s=="Resuelto"}).length,"Resueltos")+kp(ab,"Pendientes")+'</div>'+(tks.length?tks.map(function(t,i){return '<div class="card"><div class="top"><h3>'+esc(t.pc)+' · '+esc(t.o)+'</h3><span class="pill '+(t.s=="Resuelto"?"ok":t.s=="En curso"?"warn":"bad")+'">'+t.s+'</span></div><p>'+esc(t.t)+'</p><form data-n="'+i+'"><div class="row2"><label>Estado<select name="s">'+["Abierto","En curso","Resuelto"].map(function(s){return '<option'+(s==t.s?" selected":"")+'>'+s+'</option>'}).join("")+'</select></label><label>Nota técnica<input name="n" value="'+esc(t.n)+'"></label></div><button class="btn sm" type="submit">Guardar cambios</button></form></div>'}).join(""):'<div class="card muted">No hay tickets.</div>');
+}
+function bind(){
+ var q=function(s){return document.querySelectorAll(s)},one=function(s){return document.querySelector(s)};
+ if(!me){
+  one("#lf").onsubmit=function(e){e.preventDefault();var u=USERS.filter(function(x){return x.e==one("#le").value.trim().toLowerCase()&&x.p==one("#lp").value})[0];if(u){me=u;msg=""}else msg="Correo o contraseña incorrectos.";go()};
+  q("[data-u]").forEach(function(b){b.onclick=function(){me=USERS[b.dataset.u];go()}});
+  return;
+ }
+ if(me.r=="admin"){
+  q("[data-tg]").forEach(function(b){b.onclick=function(){var o=orgs[b.dataset.tg];o.st=o.st=="Activa"?"Suspendida":"Activa";go();toast(o.n+": "+o.st.toLowerCase())}});
+  one("#of").onsubmit=function(e){e.preventDefault();orgs.push({n:one("#on").value.trim(),eq:+one("#oe").value,st:"Activa"});go();toast("Organización registrada")};
+ }
+ if(me.r=="cliente"){
+  var clean=function(p){var a=p.h;p.h=Math.min(98,90+Math.floor(Math.random()*8));p.u="Hoy";reps.push({id:p.id,a:a,d:p.h,f:new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"})})};
+  q("[data-m]").forEach(function(b){b.onclick=function(){clean(pcs[b.dataset.m]);go();toast("Mantenimiento completado")}});
+  one("#all").onclick=function(){pcs.forEach(function(p){if(p.u!="Hoy")clean(p)});go();toast("Mantenimiento completado en todos los equipos")};
+  q("[data-t]").forEach(function(b){b.onclick=function(){one("#tp").value=pcs[b.dataset.t].id;one("#tf").scrollIntoView({behavior:"smooth"});one("#tt").focus()}});
+  one("#tf").onsubmit=function(e){e.preventDefault();tks.unshift({id:Date.now(),o:ORG,pc:one("#tp").value,t:one("#tt").value.trim(),s:"Abierto",n:""});go();toast("Ticket enviado a soporte")};
+  one("#sf").onsubmit=function(e){e.preventDefault();sched.push({g:one("#sg").value,d:one("#sd").value,h:one("#sh").value});go();toast("Mantenimiento programado")};
+  q("[data-x]").forEach(function(b){b.onclick=function(){sched.splice(b.dataset.x,1);go()}});
+ }
+ if(me.r=="tecnico"){
+  q("form[data-n]").forEach(function(f){f.onsubmit=function(e){e.preventDefault();var t=tks[f.dataset.n];t.s=f.elements.s.value;t.n=f.elements.n.value.trim();go();toast("Ticket actualizado")}});
+ }
+}
+go();
+})();</script>
+<script>
+document.querySelectorAll('[data-open]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();document.body.classList.add('app');window.scrollTo(0,0)})});
+document.getElementById('back').addEventListener('click',function(){document.body.classList.remove('app');window.scrollTo(0,0)});
+var mb=document.getElementById('mb'),nv=document.querySelector('header nav');
+mb.addEventListener('click',function(){var o=nv.classList.toggle('open');mb.setAttribute('aria-expanded',o)});
+nv.addEventListener('click',function(e){if(e.target.tagName=='A'){nv.classList.remove('open');mb.setAttribute('aria-expanded','false')}});
+</script>
+</body>
+</html>
